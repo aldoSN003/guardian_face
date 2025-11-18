@@ -1,4 +1,7 @@
+// src/presentation/routes/AppRouter.tsx
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider } from "../context/AuthContext";
+import ProtectedRoute from "../components/auth/ProtectedRoute";
 import AuthPage from "../pages/auth/AuthPage";
 
 import AdminDashboardPage from "../pages/admin/AdminDashboardPage";
@@ -14,24 +17,82 @@ import GuardianSettingsPage from "../pages/guardian/GuardianSettingsPage";
 export default function AppRouter() {
     return (
         <BrowserRouter>
-            <Routes>
-                <Route path="/" element={<Navigate to="/auth" />} />
+            <AuthProvider>
+                <Routes>
+                    <Route path="/" element={<Navigate to="/auth" />} />
 
-                {/* Single auth page (switch admin <-> guardian, login/register) */}
-                <Route path="/auth" element={<AuthPage />} />
+                    {/* Public auth page */}
+                    <Route path="/auth" element={<AuthPage />} />
 
-                {/* Admin routes */}
-                <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
-                <Route path="/admin/manage-guardians" element={<ManageGuardiansPage />} />
-                <Route path="/admin/manage-students" element={<ManageStudentsPage />} />
-                <Route path="/admin/verify-pickup" element={<VerifyPickupPage />} />
-                <Route path="/admin/settings" element={<AdminSettingsPage />} />
+                    {/* Protected Admin routes */}
+                    <Route
+                        path="/admin/dashboard"
+                        element={
+                            <ProtectedRoute allowedRole="admin">
+                                <AdminDashboardPage />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/admin/manage-guardians"
+                        element={
+                            <ProtectedRoute allowedRole="admin">
+                                <ManageGuardiansPage />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/admin/manage-students"
+                        element={
+                            <ProtectedRoute allowedRole="admin">
+                                <ManageStudentsPage />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/admin/verify-pickup"
+                        element={
+                            <ProtectedRoute allowedRole="admin">
+                                <VerifyPickupPage />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/admin/settings"
+                        element={
+                            <ProtectedRoute allowedRole="admin">
+                                <AdminSettingsPage />
+                            </ProtectedRoute>
+                        }
+                    />
 
-                {/* Guardian routes */}
-                <Route path="/guardian/dashboard" element={<GuardianDashboardPage />} />
-                <Route path="/guardian/manage-relationships" element={<ManageRelationshipsPage />} />
-                <Route path="/guardian/settings" element={<GuardianSettingsPage />} />
-            </Routes>
+                    {/* Protected Guardian routes */}
+                    <Route
+                        path="/guardian/dashboard"
+                        element={
+                            <ProtectedRoute allowedRole="guardian">
+                                <GuardianDashboardPage />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/guardian/manage-relationships"
+                        element={
+                            <ProtectedRoute allowedRole="guardian">
+                                <ManageRelationshipsPage />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/guardian/settings"
+                        element={
+                            <ProtectedRoute allowedRole="guardian">
+                                <GuardianSettingsPage />
+                            </ProtectedRoute>
+                        }
+                    />
+                </Routes>
+            </AuthProvider>
         </BrowserRouter>
     );
 }

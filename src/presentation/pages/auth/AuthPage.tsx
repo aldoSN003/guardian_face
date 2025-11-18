@@ -1,6 +1,7 @@
 // src/presentation/pages/auth/AuthPage.tsx
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 import Card from "../../components/common/Card";
 import RoleSelector from "../../components/auth/RoleSelector";
 import ModeSelector from "../../components/auth/ModeSelector";
@@ -14,16 +15,15 @@ export default function AuthPage() {
     const [rol, setRol] = useState<Rol>("guardian");
     const [modo, setModo] = useState<Modo>("login");
     const navigate = useNavigate();
+    const { isAuthenticated, role } = useAuth();
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (rol === "admin") navigate("/admin/dashboard");
-        else navigate("/guardian/dashboard");
-    };
-
-    const handleSkip = () => {
-        navigate(rol === "admin" ? "/admin/dashboard" : "/guardian/dashboard");
-    };
+    // Redirect if already authenticated
+    useEffect(() => {
+        if (isAuthenticated) {
+            const redirectPath = role === 'admin' ? '/admin/dashboard' : '/guardian/dashboard';
+            navigate(redirectPath, { replace: true });
+        }
+    }, [isAuthenticated, role, navigate]);
 
     const handleRoleChange = (newRole: Rol) => {
         setRol(newRole);
@@ -37,7 +37,7 @@ export default function AuthPage() {
     return (
         <div className="min-h-screen flex items-center justify-center bg-white px-4">
             <Card className="w-full max-w-md" padding="lg">
-                {/* Encabezado */}
+                {/* Header */}
                 <div className="text-center mb-8">
                     <h1 className="text-2xl font-semibold text-gray-900">GuardianFace</h1>
                     <p className="text-sm text-gray-500 mt-1">
@@ -47,22 +47,22 @@ export default function AuthPage() {
                     </p>
                 </div>
 
-                {/* Selector de rol */}
+                {/* Role selector */}
                 <RoleSelector selectedRole={rol} onRoleChange={handleRoleChange} />
 
-                {/* Selector de modo (solo para tutores) */}
+                {/* Mode selector (only for guardians) */}
                 {rol === "guardian" && (
                     <ModeSelector selectedMode={modo} onModeChange={setModo} />
                 )}
 
-                {/* Formulario */}
+                {/* Form */}
                 {rol === "guardian" && modo === "register" ? (
-                    <RegisterForm onSubmit={handleSubmit} onSkip={handleSkip} />
+                    <RegisterForm />
                 ) : (
-                    <LoginForm role={rol} onSubmit={handleSubmit} onSkip={handleSkip} />
+                    <LoginForm role={rol} />
                 )}
 
-                {/* Pie de página */}
+                {/* Footer */}
                 <div className="text-center mt-6">
                     {rol === "admin" ? (
                         <p className="text-xs text-gray-400">
