@@ -9,7 +9,7 @@ export const apiClient = axios.create({
     headers: {
         'Content-Type': 'application/json',
     },
-    // withCredentials: true, // Only enable if using cookies/sessions
+    withCredentials: true, // Only enable if using cookies/sessions
 });
 
 // Response interceptor for error handling
